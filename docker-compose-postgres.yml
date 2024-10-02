@@ -1,0 +1,22 @@
+services: 
+    postgres: 
+      PGDATA: /data/postgres
+      POSTGRES_DB: postgres_db
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      deploy: ~
+      environment: ~
+      image: "postgres:11"
+      networks: 
+        - postgres_backend_network
+      placement: 
+        constraints: 
+          - "node.role == manager"
+      replicas: 1
+      resources: 
+        limits: ~
+        memory: 256M
+        reservations: ~
+      volumes: 
+        - "postgres:/data/postgres"
+  version: "3.7"

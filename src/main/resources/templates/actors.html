@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Actor Service</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header">...</div>
+
+<table class="table bg-light text-dark">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Won an Oscar</th>
+        <th>Birthday</th>
+        <th  sec:authorize="hasRole('ROLE_ADMIN')">CreatedBy</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="actor : ${allActors}">
+        <td th:text="${actor.name}"></td>
+        <td th:text="${actor.wonOscar}"></td>
+        <td th:text="${actor.birthday}"></td>
+        <td sec:authorize="hasRole('ROLE_ADMIN')" th:if="${actor.createdBy != null}" th:text="${actor.createdBy.username}">UNKNOWN</td>
+    </tr>
+    <form sec:authorize="hasRole('ROLE_ADMIN')" method="POST" th:action="@{/actors}" th:object="${actor}">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+        <tr>
+            <td>
+                <input name="name" th:field="*{name}" type="text" required>
+                <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+            </td>
+            <td><input name="wonOscar" th:field="*{wonOscar}" type="checkbox"></td>
+            <td>
+                <input name="birthday" th:field="*{birthday}" type="date" required>
+                <span class="text-danger" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
+            </td>
+            <td>
+                <button>Create</button>
+            </td>
+        </tr>
+    </form>
+    </tbody>
+</table>
+
+<div th:replace="fragments/pageNavigation :: pageNavigation">...</div>
+
+<div th:replace="fragments/footer :: footer">...</div>
+
+</body>
+</html>

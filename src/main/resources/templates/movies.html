@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Service</title>
+    <!-- Bootstrap CSS -->
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" rel="stylesheet">
+
+    <script crossorigin="anonymous"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script crossorigin="anonymous"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header">...</div>
+
+<table class="table bg-light text-dark">
+    <thead>
+    <tr>
+        <th>Cover Image</th>
+        <th>Title</th>
+        <th>Starring</th>
+        <th>Won an Oscar</th>
+        <th>Year</th>
+        <th sec:authorize="hasRole('ROLE_ADMIN')">CreatedBy</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="movie : ${listMovies}">
+        <td><img th:src="${movie.coverImage}" width="120"/></td>
+        <td th:text="${movie.title}"></td>
+        <td th:text="${movie.actors[0].name}"></td>
+        <td th:text="${movie.wonOscar}"></td>
+        <td th:text="${movie.year}"></td>
+        <td sec:authorize="hasRole('ROLE_ADMIN')" th:if="${movie.createdBy != null}"
+            th:text="${movie.createdBy.username}">UNKNOWN
+        </td>
+    </tr>
+    <form method="POST" sec:authorize="hasRole('ROLE_ADMIN')" th:action="@{/movies}" th:object="${movie}">
+        <input name="_csrf" th:value="${_csrf.token}" type="hidden"/>
+        <tr>
+            <td>
+                URL: <label>
+                <input name="coverImage" th:field="*{coverImage}" type="text"/ required>
+            </label>
+                <span class="text-danger" th:errors="*{coverImage}" th:if="${#fields.hasErrors('coverImage')}"></span>
+            </td>
+            <td>
+                <label>
+                    <input name="title" th:field="*{title}" type="text" required>
+                </label>
+                <span class="text-danger" th:errors="*{title}" th:if="${#fields.hasErrors('title')}"></span>
+            </td>
+            <td>
+                <label>
+                    <select id="actors" th:field="*{actors[0].id}" name="actors" required>
+                        <option value="">Please select an actor</option>
+                        <option th:each="actor : ${listActor}" th:value="${actor.getId()}" th:text="${actor.getName()}"></option>
+                    </select>
+                </label>
+                <span class="text-danger" th:errors="*{actors[0].id}" th:if="${#fields.hasErrors('actors[0].id')}"></span>
+            </td>
+            <td><label>
+                <input name="wonOscar" th:field="*{wonOscar}" type="checkbox">
+            </label></td>
+            <td>
+                <label>
+                    <input name="year" th:field="*{year}" type="number" required>
+                </label>
+                <span class="text-danger" th:errors="*{year}" th:if="${#fields.hasErrors('year')}"></span>
+            </td>
+            <td>
+                <button>Create</button>
+            </td>
+        </tr>
+    </form>
+    </tbody>
+</table>
+
+<div th:replace="fragments/pageNavigation :: pageNavigation">...</div>
+
+<div th:replace="fragments/footer :: footer">...</div>
+
+</body>
+</html>
